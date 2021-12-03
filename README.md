@@ -16,6 +16,7 @@ Utilizzo molto l'app per controllare la mia vettura da remoto. Tuttavia, sono un
 Con mia grande sorpresa il tutto è molto, ma molto semplice.
 I dati forniti dal server sono molto più completi rispetto all'app originale. Troviamo per esempio:
 - Informazioni sullo stato della rigenerazione del filtro antiparticolato (sulle vetture diesel), sullo stato del sistema ibrido ed ancora informazioni dettagliate per i veicoli elettrici, riguardo la ricarica;
+
 ![](https://i.imgur.com/GxyzPIA.png)
 
 - Informazioni riguardo allo stato di portiere e finestrini (per i finestrini approssimativamente anche in che percentuale sono aperti), è possibile vedere quali porte sono aperte (inclusi cofano e portellone bagagliaio);
