@@ -4,9 +4,9 @@
 <?php
 
 //Set variables
-$vin = "XXXXXXXX"; //Sost. le X con il numero di telaio
-$user = "XXXXXXX"; //Sost. le X con il nome utente/email FordPass
-$pass = "XXXXXXX"; //Sost. le X con la password FordPass
+$vin = "XXXXX"; //Sost. le X con il numero di telaio
+$user = "XXXX"; //Sost. le X con il nome utente/email FordPass
+$pass = "XXXX"; //Sost. le X con la password FordPass
 $make = "Ford";
 $model = "XXXXXXXXXXX"; //Inserire qui il modello della vettura
 $serbatoioLt = 0; //Indicare i litri totali del serabotio per il calcolo del carburante a bordo
@@ -41,6 +41,7 @@ curl_close($ch);
 
 $tokenPayload = json_decode($result);
 $token = $tokenPayload->access_token;
+$login_state = $result;
 
 
 //-------------------------
@@ -72,14 +73,37 @@ curl_close($ch);
 
 $infoPayload = json_decode($result);
 
-echo $result;
+    switch($result) {
+        case '{"$id":"1","status":400,"version":"1.0.0"}':
+            $error = "400";
+            break;
+        case '{"$id":"1","status":401,"version":"1.0.0"}':
+            $error = "401";
+            break;
+        case 'Null response returned from FIG while processing request':
+            $error = "NULL_RESP";
+            break;
+        case 0:
+            $error = "UNKNOWN";
+            break;
+    }
+    switch($login_state) {
+        case '{"error_description":"CSIAQ0264E The user name or password is invalid.","error":"invalid_grant"}':
+            $error = "AUTH";
+            break;
+            
+    }
 
 //-------------------------
 
 //Timestamp ultimo aggiornamento
 
 $last_update_timestamp = $infoPayload->vehiclestatus->lastModifiedDate;
+    if ($last_update_timestamp == "") {
+        $last_update_timestamp = "--/--/---- --:--";
+    } else {
 $last_update_timestamp = date_create($last_update_timestamp);
+    }
 
 // Formattazione valori
 
@@ -410,6 +434,77 @@ switch ($positionType) {
 
     <main data-role="content" role="main">
 
+<?php
+    switch($error) {
+        case "AUTH":
+            echo '<div
+            data-role="collapsible"
+            data-collapsed-icon="flat-cross"
+            data-theme="d"
+            data-collapsed="false"
+            data-expanded-icon="flat-cross"
+            >
+            <h3>Errore di autenticazione</h3>
+            <p>
+            Nome utente o password non validi. Ricontrollare la configurazione. (Err.: AUTH)
+            </p>
+            </div>
+            </div>
+            <br><br>';
+            break;
+        case "400":
+            echo '<div
+            data-role="collapsible"
+            data-collapsed-icon="flat-cross"
+            data-theme="d"
+            data-collapsed="false"
+            data-expanded-icon="flat-cross"
+            >
+            <h3>Errore nella richiesta</h3>
+            <p>
+            Il server ha ricevuto una richiesta non valida. Ciò può essere dovuto ad un errore nella compilazione del numero di telaio o delle credenziali. Ricontrolla i parametri inseriti e riprova. (Err.: BAD_REQUEST)
+            </p>
+            </div>
+            </div>
+            <br><br>';
+            break;
+        case "401":
+            echo '<div
+            data-role="collapsible"
+            data-collapsed-icon="flat-cross"
+            data-theme="d"
+            data-collapsed="false"
+            data-expanded-icon="flat-cross"
+            >
+            <h3>Errore nella richiesta</h3>
+            <p>
+            Il server ha ricevuto una richiesta non valida. Ciò può essere dovuto ad un errore nella compilazione del numero di telaio o delle credenziali. Ricontrolla i parametri inseriti e riprova. (Err.: BAD_REQUEST)
+            </p>
+            </div>
+            </div>
+            <br><br>';
+            break;
+        case "NULL_RESP":
+            echo '<div
+            data-role="collapsible"
+            data-collapsed-icon="flat-cross"
+            data-theme="d"
+            data-collapsed="false"
+            data-expanded-icon="flat-cross"
+            >
+            <h3>Token non valido</h3>
+            <p>
+            Il server ha ricevuto una risposta non valida durante la richiesta. La causa può essere un token errato o non valido. Controllare i parametri e riprovare. (Err.: NULL_RESP)
+            </p>
+            </div>
+            </div>
+            <br><br>';
+            break;
+    }
+    
+    
+?>
+
         <div data-role="collapsible" data-collapsed-icon="flat-new" data-expanded-icon="flat-cross">
             <h3>Info generali sul veicolo</h3>
             <p>Numero di telaio: <?php echo $vin; ?></p>
@@ -498,7 +593,13 @@ switch ($positionType) {
     </main>
 
     <footer data-role="footer">
-        <h1>Ultimo aggiornamento: <?php echo date_format($last_update_timestamp, 'm/d/Y H:i') . "<br> ver. 1.0 <br> Developed by Luca d'Addabbo"; ?></h1>
+<h1>Ultimo aggiornamento: <?php if ($last_update_timestamp == "--/--/---- --:--") {
+    echo " --/--/---- --:--<br> ver. 1.0 <br> Developed by Luca d'Addabbo";
+} else {
+    echo date_format($last_update_timestamp, 'm/d/Y H:i') . "<br> ver. 1.0 <br> Developed by Luca d'Addabbo";
+}
+     ?>
+</h1>
     </footer>
 
 </body>
